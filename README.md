@@ -5,10 +5,10 @@
 A portable AI skill for creating evidence-led Instagram and LinkedIn carousels with sharper hooks, real narrative progression, production-ready visual direction, and copy that does not sound assembled by a template.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-111111.svg)](LICENSE)
-[![RocketLabs](https://img.shields.io/badge/RocketLabs-open%20system-7C5CFC)](https://github.com/luisroquette/RocketLabs)
-[![Latest release](https://img.shields.io/github/v/release/luisroquette/carousel-story-engine)](https://github.com/luisroquette/carousel-story-engine/releases/latest)
-[![Product site](https://img.shields.io/badge/product%20site-live-6842FF)](https://luisroquette.github.io/carousel-story-engine/)
-[![GitHub stars](https://img.shields.io/github/stars/luisroquette/carousel-story-engine?style=social)](https://github.com/luisroquette/carousel-story-engine/stargazers)
+[![RocketLabs](https://img.shields.io/badge/RocketLabs-open%20system-7C5CFC)](https://github.com/luisroquette-labs/RocketLabs)
+[![Latest release](https://img.shields.io/github/v/release/luisroquette-labs/carousel-story-engine)](https://github.com/luisroquette-labs/carousel-story-engine/releases/latest)
+[![Product site](https://img.shields.io/badge/product%20site-live-6842FF)](https://luisroquette-labs.github.io/carousel-story-engine/)
+[![GitHub stars](https://img.shields.io/github/stars/luisroquette-labs/carousel-story-engine?style=social)](https://github.com/luisroquette-labs/carousel-story-engine/stargazers)
 
 [Install in 60 seconds](#install-in-60-seconds) · [See a complete output](examples/consulting-risk-carousel.md) · [Read the skill](carousel-story-engine/SKILL.md)
 
@@ -68,7 +68,7 @@ Internal reasoning and QA notes stay separate from the publishable copy. Your pr
 ### Codex
 
 ```bash
-git clone https://github.com/luisroquette/carousel-story-engine.git
+git clone https://github.com/luisroquette-labs/carousel-story-engine.git
 cp -R carousel-story-engine/carousel-story-engine ~/.codex/skills/
 ```
 
@@ -192,11 +192,11 @@ carousel-story-engine/
 
 MIT. Use it in your own projects, adapt it to your workflow, and keep the output recognizably yours.
 
-If this skill saves you from publishing one more generic carousel, [star the repository](https://github.com/luisroquette/carousel-story-engine). It helps other creators find it.
+If this skill saves you from publishing one more generic carousel, [star the repository](https://github.com/luisroquette-labs/carousel-story-engine). It helps other creators find it.
 
 ---
 
 <p align="center">
-  <strong>Carousel Story Engine is part of <a href="https://github.com/luisroquette/RocketLabs">RocketLabs</a>.</strong><br />
+  <strong>Carousel Story Engine is part of <a href="https://github.com/luisroquette-labs/RocketLabs">RocketLabs</a>.</strong><br />
   <sub>Explore more applied AI systems and reusable open-source playbooks.</sub>
 </p>

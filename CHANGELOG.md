@@ -25,4 +25,4 @@ The project follows [Semantic Versioning](https://semver.org/).
 - Repository links, assets, examples and references checked locally.
 - No runtime service, bundled credential or required API key.
 
-[0.1.0]: https://github.com/luisroquette/carousel-story-engine/releases/tag/v0.1.0
+[0.1.0]: https://github.com/luisroquette-labs/carousel-story-engine/releases/tag/v0.1.0
