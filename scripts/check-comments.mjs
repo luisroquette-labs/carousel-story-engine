@@ -4,6 +4,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { parse } from 'parse5';
 import { tokenizer } from 'acorn';
 import { Parser as YamlParser } from 'yaml';
+import { tokenize as tokenizeCss, tokenTypes as cssTokenTypes } from 'css-tree';
+import { SaxesParser } from 'saxes';
 
 function javascriptComments(source) {
   const lines = [];
@@ -20,26 +22,17 @@ function javascriptComments(source) {
 
 function cssComments(source) {
   const lines = [];
-  let quote = '';
-  let line = 1;
-  for (let i = 0; i < source.length;) {
-    const char = source[i];
-    if (char === '\n') line++;
-    if (quote) {
-      if (char === '\\') { i += 2; continue; }
-      if (char === quote) quote = '';
-    } else if (char === '"' || char === "'") {
-      quote = char;
-    } else if (source.startsWith('/*', i)) {
-      lines.push(line);
-      const end = source.indexOf('*/', i + 2);
-      const next = end < 0 ? source.length : end + 2;
-      line += source.slice(i, next).split('\n').length - 1;
-      i = next;
-      continue;
-    }
-    i++;
-  }
+  tokenizeCss(source, (type, start) => {
+    if (type === cssTokenTypes.Comment) lines.push(source.slice(0, start).split('\n').length);
+  });
+  return lines;
+}
+
+function xmlComments(source) {
+  const lines = [];
+  const parser = new SaxesParser({ xmlns: false });
+  parser.on('comment', value => lines.push(parser.line - value.split('\n').length + 1));
+  parser.write(source).close();
   return lines;
 }
 
@@ -55,6 +48,7 @@ function htmlComments(source) {
       }
     }
     for (const child of node.childNodes || []) visit(child);
+    if (node.content) visit(node.content);
   }
   visit(parse(source, { sourceCodeLocationInfo: true }));
   return lines;
@@ -75,10 +69,14 @@ function yamlComments(source) {
 }
 
 function inspect(file, source) {
-  if (/\.(?:html|svg)$/i.test(file)) return htmlComments(source);
+  if (/\.html$/i.test(file)) return htmlComments(source);
+  if (/\.(?:svg|xml)$/i.test(file)) return xmlComments(source);
   if (/\.(?:js|mjs|cjs)$/i.test(file)) return javascriptComments(source);
   if (/\.css$/i.test(file)) return cssComments(source);
   if (/\.ya?ml$/i.test(file)) return yamlComments(source);
+  if (file.endsWith('robots.txt')) {
+    return source.split('\n').flatMap((line, index) => line.includes('#') ? [index + 1] : []);
+  }
   if (file === '.gitignore' || file === '.gitattributes') {
     return source.split('\n').flatMap((line, index) => line.startsWith('#') ? [index + 1] : []);
   }
@@ -88,7 +86,11 @@ function inspect(file, source) {
 if (process.argv.includes('--self-test')) {
   assert.deepEqual(inspect('x.js', 'const r = /[//]/; const x = `${1 /* why */}`;'), [1]);
   assert.deepEqual(inspect('x.css', 'a{content:"/* literal */"} /* why */'), [1]);
+  assert.deepEqual(inspect('x.css', 'a{background:url(https://host/a/*b)}'), []);
   assert.deepEqual(inspect('x.html', '<p title="<!-- literal -->">x</p>\n<!-- why -->'), [2]);
+  assert.deepEqual(inspect('x.html', '<template><!-- why --></template>'), [1]);
+  assert.deepEqual(inspect('x.xml', '<root><![CDATA[<!-- literal -->]]><!-- why --></root>'), [1]);
+  assert.deepEqual(inspect('robots.txt', 'User-agent: *\n# why'), [2]);
   assert.deepEqual(inspect('x.yml', 'run: |\n  echo "# literal"\nname: CI # why'), [3]);
   console.log('Comment syntax checks passed.');
 } else {
