@@ -31,7 +31,20 @@ function cssComments(source) {
 function xmlComments(source) {
   const lines = [];
   const parser = new SaxesParser({ xmlns: false });
+  const tags = [];
+  parser.on('opentag', tag => tags.push(tag.name.toLowerCase()));
+  parser.on('closetag', () => tags.pop());
   parser.on('comment', value => lines.push(parser.line - value.split('\n').length + 1));
+  function inspectText(value) {
+    const tag = tags.at(-1);
+    if (tag === 'script' || tag === 'style') {
+      const scan = tag === 'script' ? javascriptComments : cssComments;
+      const start = parser.line - value.split('\n').length + 1;
+      lines.push(...scan(value).map(line => start + line - 1));
+    }
+  }
+  parser.on('text', inspectText);
+  parser.on('cdata', inspectText);
   parser.write(source).close();
   return lines;
 }
@@ -90,6 +103,7 @@ if (process.argv.includes('--self-test')) {
   assert.deepEqual(inspect('x.html', '<p title="<!-- literal -->">x</p>\n<!-- why -->'), [2]);
   assert.deepEqual(inspect('x.html', '<template><!-- why --></template>'), [1]);
   assert.deepEqual(inspect('x.xml', '<root><![CDATA[<!-- literal -->]]><!-- why --></root>'), [1]);
+  assert.deepEqual(inspect('x.svg', '<svg><style>a{/* css */}</style><script>const x=1; // js\n</script></svg>'), [1, 1]);
   assert.deepEqual(inspect('robots.txt', 'User-agent: *\n# why'), [2]);
   assert.deepEqual(inspect('x.yml', 'run: |\n  echo "# literal"\nname: CI # why'), [3]);
   console.log('Comment syntax checks passed.');
